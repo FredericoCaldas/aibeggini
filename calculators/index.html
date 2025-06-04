@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+</head>
+<body>
+    <h1>Simple Calculator</h1>
+    <div>
+        <input id="input1" type="number" placeholder="First number">
+        <select id="operation">
+            <option value="add">Add</option>
+            <option value="subtract">Subtract</option>
+            <option value="multiply">Multiply</option>
+            <option value="divide">Divide</option>
+        </select>
+        <input id="input2" type="number" placeholder="Second number">
+        <button id="calculate">Calculate</button>
+    </div>
+    <p>Result: <span id="result"></span></p>
+
+    <script>
+        async function loadPy() {
+            window.pyodide = await loadPyodide();
+            const response = await fetch('calc_formulas.py');
+            const code = await response.text();
+            pyodide.runPython(code);
+        }
+
+        function calculate() {
+            const a = parseFloat(document.getElementById('input1').value);
+            const b = parseFloat(document.getElementById('input2').value);
+            const op = document.getElementById('operation').value;
+            const func = pyodide.globals.get(op);
+            const result = func(a, b);
+            document.getElementById('result').textContent = result;
+        }
+
+        loadPy().then(() => {
+            document.getElementById('calculate').addEventListener('click', calculate);
+        });
+    </script>
+</body>
+</html>
